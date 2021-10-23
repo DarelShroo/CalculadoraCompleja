@@ -1,6 +1,8 @@
 package dad.calculadoracompleja;
 
 import javafx.application.Application;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.Property;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.geometry.Insets;
@@ -36,6 +38,8 @@ public class CalculadoraCompleja extends Application {
     private Label labelSecondRow;
     private Label labelThirtRow;
     private ArrayList<String> listOperando;
+    private String operador;
+
     @Override
     public void start(Stage stage) throws IOException {
         //Declaraciones
@@ -47,12 +51,12 @@ public class CalculadoraCompleja extends Application {
         vBoxCenter = new VBox();
         vBoxRight = new VBox();
         comboBoxOperacion = new ComboBox();
-        textFieldA = new TextField();
-        textFieldB = new TextField();
-        textFieldC = new TextField();
-        textFieldD = new TextField();
-        textFieldE = new TextField();
-        textFieldF = new TextField();
+        textFieldA = new TextField("0");
+        textFieldB = new TextField("0");
+        textFieldC = new TextField("0");
+        textFieldD = new TextField("0");
+        textFieldE = new TextField("0");
+        textFieldF = new TextField("0");
         labelFirstRow = new Label();
         labelSecondRow = new Label();
         labelThirtRow = new Label();
@@ -83,7 +87,6 @@ public class CalculadoraCompleja extends Application {
         labelSecondRow.setPadding(new Insets(5,5,5,5));
         labelThirtRow.setPadding(new Insets(5,5,5,5));
 
-
         //Construcción comboBox
         Collections.addAll(listOperando,"+","-","*","/");
         comboBoxOperacion.getItems().addAll(listOperando);
@@ -97,12 +100,33 @@ public class CalculadoraCompleja extends Application {
         vBoxRight.getChildren().addAll(buttonOperador);
         hBoxFullScene.getChildren().addAll(vBoxLeft,vBoxCenter,vBoxRight);
 
+        //Evento
+        buttonOperador.setOnAction(e -> eventOperador(e));
         comboBoxOperacion.setOnAction(e -> tipoOperacion(e));
 
         Scene scene = new Scene(hBoxFullScene, 320, 240);
-        stage.setTitle("Hello!");
+        stage.setTitle("CalculadoraCompleja");
         stage.setScene(scene);
         stage.show();
+    }
+
+    private void eventOperador(ActionEvent e) {
+        if(operador!=null) {
+            switch (operador) {
+                case "+":
+                    operacionSuma();
+                    break;
+                case "-":
+                    operacionResta();
+                    break;
+                case "*":
+                    operacionMultiplicacion();
+                    break;
+                case "/":
+                    operacionDivision();
+                    break;
+            }
+        }
     }
 
     private void tipoOperacion(Event e) {
@@ -110,33 +134,80 @@ public class CalculadoraCompleja extends Application {
         labelFirstRow.setText(operacionSeleccionada);
         labelSecondRow.setText(operacionSeleccionada);
         labelThirtRow.setText(operacionSeleccionada);
+
         switch(operacionSeleccionada){
             case "+":
-                operacionSuma();
+                operador = "+";
                 break;
             case "-":
-                operacionResta();
+                operador = "-";
                 break;
             case "*":
-                operacionMultiplicacion();
+                operador = "*";
                 break;
             case "/":
-                operacionDivision();
+                operador = "/";
                 break;
+        }
+    }
+    private void operacionSuma() {
+        try{
+            double textFieldA = Double.parseDouble(this.textFieldA.getText());
+            double textFieldB = Double.parseDouble(this.textFieldB.getText());
+            double textFieldC = Double.parseDouble(this.textFieldC.getText());
+            double textFieldD = Double.parseDouble(this.textFieldD.getText());
+
+            double parteReal = textFieldA+textFieldC;
+            double parteImaginaria = textFieldB+textFieldD;
+
+            this.textFieldE.setText(String.valueOf(parteReal));
+            this.textFieldF.setText(String.valueOf(parteImaginaria));
+
+        }catch(NumberFormatException e){
+            System.out.println("No son números válidos");
+        }
+    }
+
+    private void operacionResta() {
+        try {
+            double textFieldA = Double.parseDouble(this.textFieldA.getText());
+            double textFieldB = Double.parseDouble(this.textFieldB.getText());
+            double textFieldC = Double.parseDouble(this.textFieldC.getText());
+            double textFieldD = Double.parseDouble(this.textFieldD.getText());
+
+            double parteReal = textFieldA - textFieldC;
+            double parteImaginaria = textFieldB - textFieldD;
+
+            this.textFieldE.setText(String.valueOf(parteReal));
+            this.textFieldF.setText(String.valueOf(parteImaginaria));
+        }catch(NumberFormatException e){
+            System.out.println("No son números válidos");
         }
     }
 
     private void operacionMultiplicacion() {
-    }
+        try{
+            double textFieldA = Double.parseDouble(this.textFieldA.getText());
+            double textFieldB = Double.parseDouble(this.textFieldB.getText());
+            double textFieldC = Double.parseDouble(this.textFieldC.getText());
+            double textFieldD = Double.parseDouble(this.textFieldD.getText());
 
-    private void operacionResta() {
-    }
+            double parteReal = (textFieldA*textFieldC - textFieldB*textFieldD);
+            double parteImaginaria = (textFieldA*textFieldD + textFieldB*textFieldC);
 
-    private void operacionSuma() {
-        System.out.println(10);
+            this.textFieldE.setText(String.valueOf(parteReal));
+            this.textFieldF.setText(String.valueOf(parteImaginaria));
+        }catch(NumberFormatException e){
+            System.out.println("No son números válidos");
+        }
     }
 
     private void operacionDivision() {
+        try{
+
+        }catch(NumberFormatException e){
+            System.out.println("No son números válidos");
+        }
     }
 
     public static void main(String[] args) {
