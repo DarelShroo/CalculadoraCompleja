@@ -1,10 +1,6 @@
 package dad.calculadoracompleja;
 
 import javafx.application.Application;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.Property;
-import javafx.event.ActionEvent;
-import javafx.event.Event;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -12,8 +8,8 @@ import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.util.converter.NumberStringConverter;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -24,7 +20,6 @@ public class CalculadoraCompleja extends Application {
     private HBox hBoxCenterThirt;
     private VBox vBoxLeft;
     private VBox vBoxCenter;
-    private VBox vBoxRight;
     private ComboBox comboBoxOperacion;
     private TextField textFieldA;
     private TextField textFieldB;
@@ -32,24 +27,20 @@ public class CalculadoraCompleja extends Application {
     private TextField textFieldD;
     private TextField textFieldE;
     private TextField textFieldF;
-    private Button buttonOperador;
     private Separator separator;
-    private Label labelFirstRow;
-    private Label labelSecondRow;
-    private Label labelThirtRow;
     private ArrayList<String> listOperando;
-    private String operador;
-
+    private NumeroComplejo numeroComplejoFirst;
+    private NumeroComplejo numeroComplejoSecond;
+    private  NumeroComplejo numeroComplejoResultado;
     @Override
-    public void start(Stage stage) throws IOException {
+    public void start(Stage stage) throws Exception {
         //Declaraciones
-        hBoxFullScene = new HBox();
-        hBoxCenterFirst = new HBox();
-        hBoxCenterSecond = new HBox();
-        hBoxCenterThirt = new HBox();
-        vBoxLeft = new VBox();
-        vBoxCenter = new VBox();
-        vBoxRight = new VBox();
+        hBoxFullScene = new HBox(10);
+        hBoxCenterFirst = new HBox(10);
+        hBoxCenterSecond = new HBox(10);
+        hBoxCenterThirt = new HBox(10);
+        vBoxLeft = new VBox(10);
+        vBoxCenter = new VBox(10);
         comboBoxOperacion = new ComboBox();
         textFieldA = new TextField("0");
         textFieldB = new TextField("0");
@@ -57,156 +48,113 @@ public class CalculadoraCompleja extends Application {
         textFieldD = new TextField("0");
         textFieldE = new TextField("0");
         textFieldF = new TextField("0");
-        labelFirstRow = new Label();
-        labelSecondRow = new Label();
-        labelThirtRow = new Label();
-        buttonOperador = new Button("=");
         separator = new Separator();
         listOperando  = new ArrayList<>();
+        numeroComplejoFirst = new NumeroComplejo();
+        numeroComplejoSecond = new NumeroComplejo();
+        numeroComplejoResultado = new NumeroComplejo();
+        textFieldE.setDisable(true);
+        textFieldF.setDisable(true);
 
         //Alineación
         hBoxFullScene.setAlignment(Pos.CENTER);
         vBoxLeft.setAlignment(Pos.CENTER);
         vBoxCenter.setAlignment(Pos.CENTER);
-        vBoxRight.setAlignment(Pos.CENTER);
+        textFieldA.setAlignment(Pos.CENTER);
+        textFieldB.setAlignment(Pos.CENTER);
+        textFieldC.setAlignment(Pos.CENTER);
+        textFieldD.setAlignment(Pos.CENTER);
+        textFieldE.setAlignment(Pos.CENTER);
+        textFieldF.setAlignment(Pos.CENTER);
 
         //Tamaño
-        buttonOperador.setMinWidth(30);
         comboBoxOperacion.setMinWidth(60);
-        labelFirstRow.setMinWidth(20);
-        labelSecondRow.setMinWidth(20);
-        labelThirtRow.setMinWidth(20);
+        textFieldA.setMaxWidth(60);
+        textFieldB.setMaxWidth(60);
+        textFieldC.setMaxWidth(60);
+        textFieldD.setMaxWidth(60);
+        textFieldE.setMaxWidth(60);
+        textFieldF.setMaxWidth(60);
 
-        //Padding
-        hBoxFullScene.setPadding(new Insets(5,5,5,5));
-        vBoxCenter.setPadding(new Insets(5,5,5,5));
-        hBoxCenterFirst.setPadding(new Insets(5,5,5,5));
-        hBoxCenterSecond.setPadding(new Insets(5,5,5,5));
-        hBoxCenterThirt.setPadding(new Insets(5,5,5,5));
-        labelFirstRow.setPadding(new Insets(5,5,5,5));
-        labelSecondRow.setPadding(new Insets(5,5,5,5));
-        labelThirtRow.setPadding(new Insets(5,5,5,5));
 
         //Construcción comboBox
         Collections.addAll(listOperando,"+","-","*","/");
         comboBoxOperacion.getItems().addAll(listOperando);
+        comboBoxOperacion.getSelectionModel().select(0);
 
         //Construcción del contenido
         vBoxLeft.getChildren().addAll(comboBoxOperacion);
-        hBoxCenterFirst.getChildren().addAll(textFieldA,labelFirstRow,textFieldB);
-        hBoxCenterSecond.getChildren().addAll(textFieldC,labelSecondRow,textFieldD);
-        hBoxCenterThirt.getChildren().addAll(textFieldE,labelThirtRow,textFieldF);
-        vBoxCenter.getChildren().addAll(hBoxCenterFirst, hBoxCenterSecond, hBoxCenterThirt);
-        vBoxRight.getChildren().addAll(buttonOperador);
-        hBoxFullScene.getChildren().addAll(vBoxLeft,vBoxCenter,vBoxRight);
+        hBoxCenterFirst.getChildren().addAll(textFieldA,new Label("+"),textFieldB, new Label("i"));
+        hBoxCenterSecond.getChildren().addAll(textFieldC,new Label("+"),textFieldD, new Label("i"));
+        hBoxCenterThirt.getChildren().addAll(textFieldE,new Label("+"),textFieldF, new Label("i"));
+        vBoxCenter.getChildren().addAll(hBoxCenterFirst, hBoxCenterSecond, separator,hBoxCenterThirt);
+        hBoxFullScene.getChildren().addAll(vBoxLeft,vBoxCenter);
 
         //Evento
-        buttonOperador.setOnAction(e -> eventOperador(e));
-        comboBoxOperacion.setOnAction(e -> tipoOperacion(e));
+       comboBoxOperacion.getSelectionModel().selectedIndexProperty().addListener((v,ov,nv) -> tipoOperacion());
 
+        //Bindings
+        try {
+            textFieldA.textProperty().bindBidirectional(numeroComplejoFirst.parteRealProperty(), new NumberStringConverter());
+            textFieldB.textProperty().bindBidirectional(numeroComplejoFirst.parteImaginariaProperty(), new NumberStringConverter());
+            textFieldC.textProperty().bindBidirectional(numeroComplejoSecond.parteRealProperty(), new NumberStringConverter());
+            textFieldD.textProperty().bindBidirectional(numeroComplejoSecond.parteImaginariaProperty(), new NumberStringConverter());
+            textFieldE.textProperty().bindBidirectional(numeroComplejoResultado.parteRealProperty(), new NumberStringConverter());
+            textFieldF.textProperty().bindBidirectional(numeroComplejoResultado.parteImaginariaProperty(), new NumberStringConverter());
+
+        }catch(RuntimeException e){
+            System.out.println(e);
+        };
         Scene scene = new Scene(hBoxFullScene, 320, 240);
         stage.setTitle("CalculadoraCompleja");
         stage.setScene(scene);
         stage.show();
     }
 
-    private void eventOperador(ActionEvent e) {
-        if(operador!=null) {
-            switch (operador) {
-                case "+":
-                    operacionSuma();
+
+    private void tipoOperacion() {
+        switch(this.comboBoxOperacion.getSelectionModel().getSelectedIndex()) {
+            case 0:
+                try {
+                    this.numeroComplejoResultado.parteRealProperty().bind(this.numeroComplejoFirst.parteRealProperty().add(this.numeroComplejoSecond.parteRealProperty()));
+                    this.numeroComplejoResultado.parteImaginariaProperty().bind(this.numeroComplejoFirst.parteImaginariaProperty().add(this.numeroComplejoSecond.parteImaginariaProperty()));
+                }catch(NullPointerException e){
+                    System.out.println(e);
+                }
                     break;
-                case "-":
-                    operacionResta();
-                    break;
-                case "*":
-                    operacionMultiplicacion();
-                    break;
-                case "/":
-                    operacionDivision();
-                    break;
-            }
-        }
-    }
-
-    private void tipoOperacion(Event e) {
-        String operacionSeleccionada =  comboBoxOperacion.getSelectionModel().getSelectedItem().toString();
-        labelFirstRow.setText(operacionSeleccionada);
-        labelSecondRow.setText(operacionSeleccionada);
-        labelThirtRow.setText(operacionSeleccionada);
-
-        switch(operacionSeleccionada){
-            case "+":
-                operador = "+";
+            case 1:
+                this.numeroComplejoResultado.parteRealProperty().bind(this.numeroComplejoFirst.parteRealProperty().subtract(this.numeroComplejoSecond.parteRealProperty()));
+                this.numeroComplejoResultado.parteImaginariaProperty().bind(this.numeroComplejoFirst.parteImaginariaProperty().subtract(this.numeroComplejoSecond.parteImaginariaProperty()));
                 break;
-            case "-":
-                operador = "-";
+
+            case 2:
+                this.numeroComplejoResultado.parteRealProperty().bind((this.numeroComplejoFirst.parteRealProperty()
+                        .multiply(this.numeroComplejoSecond.parteRealProperty()))
+                        .subtract(this.numeroComplejoFirst.parteImaginariaProperty().multiply(this.numeroComplejoSecond.parteImaginariaProperty())));
+                this.numeroComplejoResultado.parteImaginariaProperty().bind((numeroComplejoFirst.parteRealProperty()
+                        .multiply(numeroComplejoSecond.parteImaginariaProperty()))
+                        .add(numeroComplejoFirst.parteImaginariaProperty().multiply(numeroComplejoSecond.parteRealProperty())));
                 break;
-            case "*":
-                operador = "*";
+
+            case 3:
+                this.numeroComplejoResultado.parteRealProperty().bind((numeroComplejoFirst.parteRealProperty()
+                        .multiply(numeroComplejoSecond.parteRealProperty()))
+                        .add(numeroComplejoFirst.parteImaginariaProperty()
+                                .multiply(numeroComplejoSecond.parteImaginariaProperty()))
+                        .divide((numeroComplejoSecond.parteRealProperty()
+                                .multiply(numeroComplejoSecond.parteRealProperty()))
+                                .add(numeroComplejoSecond.parteImaginariaProperty()
+                                        .multiply(numeroComplejoSecond.parteImaginariaProperty()))));
+
+                this.numeroComplejoResultado.parteImaginariaProperty().bind((numeroComplejoFirst.parteImaginariaProperty()
+                        .multiply(numeroComplejoSecond.parteRealProperty()))
+                        .subtract(numeroComplejoFirst.parteRealProperty()
+                                .multiply(numeroComplejoSecond.parteImaginariaProperty()))
+                        .divide((numeroComplejoSecond.parteRealProperty()
+                                .multiply(numeroComplejoSecond.parteRealProperty()))
+                                .add(numeroComplejoSecond.parteImaginariaProperty()
+                                        .multiply(numeroComplejoSecond.parteImaginariaProperty()))));
                 break;
-            case "/":
-                operador = "/";
-                break;
-        }
-    }
-    private void operacionSuma() {
-        try{
-            double textFieldA = Double.parseDouble(this.textFieldA.getText());
-            double textFieldB = Double.parseDouble(this.textFieldB.getText());
-            double textFieldC = Double.parseDouble(this.textFieldC.getText());
-            double textFieldD = Double.parseDouble(this.textFieldD.getText());
-
-            double parteReal = textFieldA+textFieldC;
-            double parteImaginaria = textFieldB+textFieldD;
-
-            this.textFieldE.setText(String.valueOf(parteReal));
-            this.textFieldF.setText(String.valueOf(parteImaginaria));
-
-        }catch(NumberFormatException e){
-            System.out.println("No son números válidos");
-        }
-    }
-
-    private void operacionResta() {
-        try {
-            double textFieldA = Double.parseDouble(this.textFieldA.getText());
-            double textFieldB = Double.parseDouble(this.textFieldB.getText());
-            double textFieldC = Double.parseDouble(this.textFieldC.getText());
-            double textFieldD = Double.parseDouble(this.textFieldD.getText());
-
-            double parteReal = textFieldA - textFieldC;
-            double parteImaginaria = textFieldB - textFieldD;
-
-            this.textFieldE.setText(String.valueOf(parteReal));
-            this.textFieldF.setText(String.valueOf(parteImaginaria));
-        }catch(NumberFormatException e){
-            System.out.println("No son números válidos");
-        }
-    }
-
-    private void operacionMultiplicacion() {
-        try{
-            double textFieldA = Double.parseDouble(this.textFieldA.getText());
-            double textFieldB = Double.parseDouble(this.textFieldB.getText());
-            double textFieldC = Double.parseDouble(this.textFieldC.getText());
-            double textFieldD = Double.parseDouble(this.textFieldD.getText());
-
-            double parteReal = (textFieldA*textFieldC - textFieldB*textFieldD);
-            double parteImaginaria = (textFieldA*textFieldD + textFieldB*textFieldC);
-
-            this.textFieldE.setText(String.valueOf(parteReal));
-            this.textFieldF.setText(String.valueOf(parteImaginaria));
-        }catch(NumberFormatException e){
-            System.out.println("No son números válidos");
-        }
-    }
-
-    private void operacionDivision() {
-        try{
-
-        }catch(NumberFormatException e){
-            System.out.println("No son números válidos");
         }
     }
 
