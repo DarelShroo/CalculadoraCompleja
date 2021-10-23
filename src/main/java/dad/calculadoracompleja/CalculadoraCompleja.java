@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class HelloApplication extends Application {
+public class CalculadoraCompleja extends Application {
     private HBox hBoxFullScene;
     private HBox hBoxCenterFirst;
     private HBox hBoxCenterSecond;
