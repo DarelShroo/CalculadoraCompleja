@@ -1,10 +1,12 @@
 package dad.calculadoracompleja;
 
 import javafx.application.Application;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.Separator;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -31,7 +33,12 @@ public class CalculadoraCompleja extends Application {
     private ArrayList<String> listOperando;
     private NumeroComplejo numeroComplejoFirst;
     private NumeroComplejo numeroComplejoSecond;
-    private  NumeroComplejo numeroComplejoResultado;
+    private NumeroComplejo numeroComplejoResultado;
+
+    public static void main(String[] args) {
+        launch();
+    }
+
     @Override
     public void start(Stage stage) throws Exception {
         //Declaraciones
@@ -49,7 +56,7 @@ public class CalculadoraCompleja extends Application {
         textFieldE = new TextField("0");
         textFieldF = new TextField("0");
         separator = new Separator();
-        listOperando  = new ArrayList<>();
+        listOperando = new ArrayList<>();
         numeroComplejoFirst = new NumeroComplejo();
         numeroComplejoSecond = new NumeroComplejo();
         numeroComplejoResultado = new NumeroComplejo();
@@ -78,20 +85,20 @@ public class CalculadoraCompleja extends Application {
 
 
         //Construcción comboBox
-        Collections.addAll(listOperando,"+","-","*","/");
+        Collections.addAll(listOperando, "+", "-", "*", "/");
         comboBoxOperacion.getItems().addAll(listOperando);
         comboBoxOperacion.getSelectionModel().select(0);
 
         //Construcción del contenido
         vBoxLeft.getChildren().addAll(comboBoxOperacion);
-        hBoxCenterFirst.getChildren().addAll(textFieldA,new Label("+"),textFieldB, new Label("i"));
-        hBoxCenterSecond.getChildren().addAll(textFieldC,new Label("+"),textFieldD, new Label("i"));
-        hBoxCenterThirt.getChildren().addAll(textFieldE,new Label("+"),textFieldF, new Label("i"));
-        vBoxCenter.getChildren().addAll(hBoxCenterFirst, hBoxCenterSecond, separator,hBoxCenterThirt);
-        hBoxFullScene.getChildren().addAll(vBoxLeft,vBoxCenter);
+        hBoxCenterFirst.getChildren().addAll(textFieldA, new Label("+"), textFieldB, new Label("i"));
+        hBoxCenterSecond.getChildren().addAll(textFieldC, new Label("+"), textFieldD, new Label("i"));
+        hBoxCenterThirt.getChildren().addAll(textFieldE, new Label("+"), textFieldF, new Label("i"));
+        vBoxCenter.getChildren().addAll(hBoxCenterFirst, hBoxCenterSecond, separator, hBoxCenterThirt);
+        hBoxFullScene.getChildren().addAll(vBoxLeft, vBoxCenter);
 
         //Evento
-       comboBoxOperacion.getSelectionModel().selectedIndexProperty().addListener((v,ov,nv) -> tipoOperacion());
+        comboBoxOperacion.getSelectionModel().selectedIndexProperty().addListener((v, ov, nv) -> tipoOperacion());
 
         //Bindings
         try {
@@ -102,26 +109,25 @@ public class CalculadoraCompleja extends Application {
             textFieldE.textProperty().bindBidirectional(numeroComplejoResultado.parteRealProperty(), new NumberStringConverter());
             textFieldF.textProperty().bindBidirectional(numeroComplejoResultado.parteImaginariaProperty(), new NumberStringConverter());
 
-        }catch(RuntimeException e){
+        } catch (RuntimeException e) {
             System.out.println(e);
-        };
+        }
         Scene scene = new Scene(hBoxFullScene, 320, 240);
         stage.setTitle("CalculadoraCompleja");
         stage.setScene(scene);
         stage.show();
     }
 
-
     private void tipoOperacion() {
-        switch(this.comboBoxOperacion.getSelectionModel().getSelectedIndex()) {
+        switch (this.comboBoxOperacion.getSelectionModel().getSelectedIndex()) {
             case 0:
                 try {
                     this.numeroComplejoResultado.parteRealProperty().bind(this.numeroComplejoFirst.parteRealProperty().add(this.numeroComplejoSecond.parteRealProperty()));
                     this.numeroComplejoResultado.parteImaginariaProperty().bind(this.numeroComplejoFirst.parteImaginariaProperty().add(this.numeroComplejoSecond.parteImaginariaProperty()));
-                }catch(NullPointerException e){
+                } catch (NullPointerException e) {
                     System.out.println(e);
                 }
-                    break;
+                break;
             case 1:
                 this.numeroComplejoResultado.parteRealProperty().bind(this.numeroComplejoFirst.parteRealProperty().subtract(this.numeroComplejoSecond.parteRealProperty()));
                 this.numeroComplejoResultado.parteImaginariaProperty().bind(this.numeroComplejoFirst.parteImaginariaProperty().subtract(this.numeroComplejoSecond.parteImaginariaProperty()));
@@ -158,7 +164,147 @@ public class CalculadoraCompleja extends Application {
         }
     }
 
-    public static void main(String[] args) {
-        launch();
+    public HBox gethBoxFullScene() {
+        return hBoxFullScene;
+    }
+
+    public void sethBoxFullScene(HBox hBoxFullScene) {
+        this.hBoxFullScene = hBoxFullScene;
+    }
+
+    public HBox gethBoxCenterFirst() {
+        return hBoxCenterFirst;
+    }
+
+    public void sethBoxCenterFirst(HBox hBoxCenterFirst) {
+        this.hBoxCenterFirst = hBoxCenterFirst;
+    }
+
+    public HBox gethBoxCenterSecond() {
+        return hBoxCenterSecond;
+    }
+
+    public void sethBoxCenterSecond(HBox hBoxCenterSecond) {
+        this.hBoxCenterSecond = hBoxCenterSecond;
+    }
+
+    public HBox gethBoxCenterThirt() {
+        return hBoxCenterThirt;
+    }
+
+    public void sethBoxCenterThirt(HBox hBoxCenterThirt) {
+        this.hBoxCenterThirt = hBoxCenterThirt;
+    }
+
+    public VBox getvBoxLeft() {
+        return vBoxLeft;
+    }
+
+    public void setvBoxLeft(VBox vBoxLeft) {
+        this.vBoxLeft = vBoxLeft;
+    }
+
+    public VBox getvBoxCenter() {
+        return vBoxCenter;
+    }
+
+    public void setvBoxCenter(VBox vBoxCenter) {
+        this.vBoxCenter = vBoxCenter;
+    }
+
+    public ComboBox getComboBoxOperacion() {
+        return comboBoxOperacion;
+    }
+
+    public void setComboBoxOperacion(ComboBox comboBoxOperacion) {
+        this.comboBoxOperacion = comboBoxOperacion;
+    }
+
+    public TextField getTextFieldA() {
+        return textFieldA;
+    }
+
+    public void setTextFieldA(TextField textFieldA) {
+        this.textFieldA = textFieldA;
+    }
+
+    public TextField getTextFieldB() {
+        return textFieldB;
+    }
+
+    public void setTextFieldB(TextField textFieldB) {
+        this.textFieldB = textFieldB;
+    }
+
+    public TextField getTextFieldC() {
+        return textFieldC;
+    }
+
+    public void setTextFieldC(TextField textFieldC) {
+        this.textFieldC = textFieldC;
+    }
+
+    public TextField getTextFieldD() {
+        return textFieldD;
+    }
+
+    public void setTextFieldD(TextField textFieldD) {
+        this.textFieldD = textFieldD;
+    }
+
+    public TextField getTextFieldE() {
+        return textFieldE;
+    }
+
+    public void setTextFieldE(TextField textFieldE) {
+        this.textFieldE = textFieldE;
+    }
+
+    public TextField getTextFieldF() {
+        return textFieldF;
+    }
+
+    public void setTextFieldF(TextField textFieldF) {
+        this.textFieldF = textFieldF;
+    }
+
+    public Separator getSeparator() {
+        return separator;
+    }
+
+    public void setSeparator(Separator separator) {
+        this.separator = separator;
+    }
+
+    public ArrayList<String> getListOperando() {
+        return listOperando;
+    }
+
+    public void setListOperando(ArrayList<String> listOperando) {
+        this.listOperando = listOperando;
+    }
+
+    public NumeroComplejo getNumeroComplejoFirst() {
+        return numeroComplejoFirst;
+    }
+
+    public void setNumeroComplejoFirst(NumeroComplejo numeroComplejoFirst) {
+        this.numeroComplejoFirst = numeroComplejoFirst;
+    }
+
+    public NumeroComplejo getNumeroComplejoSecond() {
+        return numeroComplejoSecond;
+    }
+
+    public void setNumeroComplejoSecond(NumeroComplejo numeroComplejoSecond) {
+        this.numeroComplejoSecond = numeroComplejoSecond;
+    }
+
+    public NumeroComplejo getNumeroComplejoResultado() {
+        return numeroComplejoResultado;
+    }
+
+    public void setNumeroComplejoResultado(NumeroComplejo numeroComplejoResultado) {
+        this.numeroComplejoResultado = numeroComplejoResultado;
     }
 }
